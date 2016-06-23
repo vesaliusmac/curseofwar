@@ -37,6 +37,16 @@
 #include "client.h"
 #include "server.h"
 #include "main-common.h"
+typedef unsigned long long ticks;
+static __inline__ ticks getticks(void)
+{
+     unsigned d;
+     // asm("cpuid");
+     // asm volatile("rdtsc" : "=a" (a), "=d" (d));
+	__asm__ __volatile__ ("rdtsc" : "=A" (d) );
+     // return (((ticks)a) | (((ticks)d) << 32));
+	 return d;
+}
 
 /*****************************************************************************/
 /*                           Global Constants                                */
@@ -72,35 +82,61 @@ void win_or_lose_message(struct state *st, int k) {
 void run (struct state *st, struct ui *ui) {
   int k = 0;
   int finished = 0;
-  struct timeval tv, tt;
-  long int diff=0;
+  struct timeval /*tv, tt,*/ tr, ts;
+  long long diff=0;
+  ticks tick,tick1;
   while( !finished ) {
-	gettimeofday(&tv,NULL);
+	gettimeofday(&ts,NULL);
     if (time_to_redraw) {
       k++;
       if (k>=1600) k=0;
       
+	  
       int slowdown = game_slowdown(st->speed);
       if (k % slowdown == 0 && st->speed != sp_pause) { 
+		// gettimeofday(&tv,NULL);
+		tick = getticks();
         kings_move(st);
+		tick1 = getticks();
+		// gettimeofday(&tt,NULL);
+	  // diff=(tt.tv_sec*1000000+tt.tv_usec)-(tv.tv_sec*1000000+tv.tv_usec);
+		diff=(tick1-tick);
+	  fprintf(stderr,"%lld\t",diff);
+	  // gettimeofday(&tv,NULL);
+	  tick = getticks();
         simulate(st);
+		tick1 = getticks();
+		// gettimeofday(&tt,NULL);
+	  // diff=(tt.tv_sec*1000000+tt.tv_usec)-(tv.tv_sec*1000000+tv.tv_usec);
+	  // fprintf(stderr,"simulate time %ld\n",diff);
+	  diff=(tick1-tick);
+	  fprintf(stderr,"%lld\t",diff);
         if (st->show_timeline) {
           if (st->time%10 == 0)
             update_timeline(st);
         }
       }
+	  
+	  // gettimeofday(&tv,NULL);
+	  tick = getticks();
       output_grid(st, ui, k);
       if (st->show_timeline) {
         // if (st->time%10 == 0)
           output_timeline(st, ui);
       }
+	  // gettimeofday(&tt,NULL);
+	  // diff=(tt.tv_sec*1000000+tt.tv_usec)-(tv.tv_sec*1000000+tv.tv_usec);
+	  tick1 = getticks();
+	   diff=(tick1-tick);
+	  fprintf(stderr,"%lld\n",diff);
       time_to_redraw = 0;
       win_or_lose_message(st, k);
+	  
     }
     finished = update_from_input(st, ui);
-	gettimeofday(&tt,NULL);
-	diff=(tt.tv_sec*1000000+tt.tv_usec)-(tv.tv_sec*1000000+tv.tv_usec);
-	fprintf(stderr,"frame time %ld\n",diff);
+	gettimeofday(&tr,NULL);
+	diff=(tr.tv_sec*1000000+tr.tv_usec)-(ts.tv_sec*1000000+ts.tv_usec);
+	// fprintf(stderr,"frame time %lld\n",diff);
 	// refresh();
     pause(); // sleep until woken up by SIGALRM
   }
@@ -317,9 +353,9 @@ int main(int argc, char* argv[]){
   /* Start the real time interval timer with delay interval size */
   struct itimerval it;
   it.it_value.tv_sec = 0;
-  it.it_value.tv_usec = 20000;
+  it.it_value.tv_usec = 16666;
   it.it_interval.tv_sec = 0;
-  it.it_interval.tv_usec = 20000;
+  it.it_interval.tv_usec = 16666;
   setitimer(ITIMER_REAL, &it, NULL);
   
   refresh();        
