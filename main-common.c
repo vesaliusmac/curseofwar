@@ -140,8 +140,8 @@ int get_options(int argc, char *argv[], struct basic_options *op, struct multi_o
   op->keep_random_flag = 0; // random
   op->dif = dif_normal; // diffiulty
   op->speed = sp_normal; // speed
-  op->w = 21; // width
-  op->h = 21; // height
+  op->w = 40; // width
+  op->h = 40; // height
   op->loc_num = 0;  // the number of starting locations
   op->map_seed = rand();
   op->conditions = 0;

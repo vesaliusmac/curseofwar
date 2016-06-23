@@ -24,8 +24,8 @@
 #define MAX_PLAYER 8  /* number of players (countries) */
 #define NEUTRAL 0     /* neutral player */
 #define MAX_CLASS 1   /* classes of units. only one exists. */
-#define MAX_WIDTH 40  /* max map width */
-#define MAX_HEIGHT 29 /* max map height */
+#define MAX_WIDTH 100  /* max map width */
+#define MAX_HEIGHT 80 /* max map height */
 #define DIRECTIONS 6  /* number of neighbors on the grid */
 
 #define MAX_POP 499   /* maximum polulation at a tile (for each player) */

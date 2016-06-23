@@ -91,7 +91,7 @@ void run (struct state *st, struct ui *ui) {
       }
       output_grid(st, ui, k);
       if (st->show_timeline) {
-        if (st->time%10 == 0)
+        // if (st->time%10 == 0)
           output_timeline(st, ui);
       }
       time_to_redraw = 0;
@@ -99,7 +99,7 @@ void run (struct state *st, struct ui *ui) {
     }
     finished = update_from_input(st, ui);
 	gettimeofday(&tt,NULL);
-	diff+=(tt.tv_sec*1000000+tt.tv_usec)-(tv.tv_sec*1000000+tv.tv_usec);
+	diff=(tt.tv_sec*1000000+tt.tv_usec)-(tv.tv_sec*1000000+tv.tv_usec);
 	fprintf(stderr,"frame time %ld\n",diff);
 	// refresh();
     pause(); // sleep until woken up by SIGALRM
@@ -317,9 +317,9 @@ int main(int argc, char* argv[]){
   /* Start the real time interval timer with delay interval size */
   struct itimerval it;
   it.it_value.tv_sec = 0;
-  it.it_value.tv_usec = 10000;
+  it.it_value.tv_usec = 20000;
   it.it_interval.tv_sec = 0;
-  it.it_interval.tv_usec = 10000;
+  it.it_interval.tv_usec = 20000;
   setitimer(ITIMER_REAL, &it, NULL);
   
   refresh();        
