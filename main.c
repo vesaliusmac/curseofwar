@@ -72,7 +72,10 @@ void win_or_lose_message(struct state *st, int k) {
 void run (struct state *st, struct ui *ui) {
   int k = 0;
   int finished = 0;
+  struct timeval tv, tt;
+  long int diff=0;
   while( !finished ) {
+	gettimeofday(&tv,NULL);
     if (time_to_redraw) {
       k++;
       if (k>=1600) k=0;
@@ -95,6 +98,9 @@ void run (struct state *st, struct ui *ui) {
       win_or_lose_message(st, k);
     }
     finished = update_from_input(st, ui);
+	gettimeofday(&tt,NULL);
+	diff+=(tt.tv_sec*1000000+tt.tv_usec)-(tv.tv_sec*1000000+tv.tv_usec);
+	fprintf(stderr,"frame time %ld\n",diff);
 	// refresh();
     pause(); // sleep until woken up by SIGALRM
   }
